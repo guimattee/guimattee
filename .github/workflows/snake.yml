@@ -33,17 +33,18 @@ jobs:
           github_user_name: guimattee # Seu username GitHub
           outputs: dist/snake.svg, dist/snake-dark.svg # Onde a cobrinha será gerada
 
-      # DEBUG: Verifica o conteúdo da pasta dist APÓS a geração da cobrinha (opcional, pode remover depois)
+      # DEBUG: Verifica o conteúdo da pasta dist APÓS a geração da cobrinha
+      # Isto é crucial para confirmar que 'dist' e os SVGs existem no ambiente do workflow.
       - name: Debug - After snake generation
         run: |
           echo "Conteúdo da pasta 'dist/' após a geração da cobrinha:"
-          ls -la dist/ || echo "Pasta 'dist/' não encontrada!"
+          ls -la dist/ || echo "Pasta 'dist/' não encontrada! Isso é um problema."
         if: success()
 
       # Passo 3: Commita os arquivos gerados de volta para o repositório
       # Usamos a action 'git-auto-commit-action' para isso, que é mais robusta.
       - name: Commit generated files
-        uses: stefanzweifel/git-auto-commit-action@v5 # <-- NOVA ACTION AQUI
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Generated snake animation [skip ci]" # Mensagem do commit
           branch: main # Garante que o commit vá para a branch principal
@@ -52,6 +53,6 @@ jobs:
           # O caminho para os arquivos que devem ser commitados.
           # O diretório de trabalho padrão é o root do repo, então 'dist/' já funciona.
           file_pattern: 'dist/snake.svg dist/snake-dark.svg'
-        # Condição para rodar este passo APENAS se o passo de geração da cobrinha foi bem-sucedido
-        # Simplificamos a condição, pois o debug confirmou que 'dist/' existe após a geração.
-        if: success() # <-- CONDIÇÃO SIMPLIFICADA AQUI
+        env: # <--- Adicionamos isto para garantir que o GITHUB_TOKEN é passado
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: success() # Condição para rodar este passo APENAS se o passo anterior foi bem-sucedido
