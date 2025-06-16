@@ -19,6 +19,12 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
+      # DEBUG: Verifica o conteúdo antes de gerar a cobrinha
+      - name: Debug - Before snake generation
+        run: |
+          echo "Conteúdo do diretório de trabalho antes da geração da cobrinha:"
+          ls -la
+
       # Passo 2: Gera a animação da cobrinha
       - name: Generate snake SVG
         uses: Platane/snk@v3
@@ -26,6 +32,14 @@ jobs:
         with:
           github_user_name: guimattee # Seu username GitHub
           outputs: dist/snake.svg, dist/snake-dark.svg # Onde a cobrinha será gerada
+
+      # DEBUG: Verifica o conteúdo da pasta dist APÓS a geração da cobrinha
+      - name: Debug - After snake generation
+        run: |
+          echo "Conteúdo da pasta 'dist/' após a geração da cobrinha:"
+          ls -la dist/ || echo "Pasta 'dist/' não encontrada!"
+        # Este passo de debug só é relevante se o passo anterior de geração foi bem-sucedido
+        if: success() && steps.snake-generator.outputs.outputs != ''
 
       # Passo 3: Commita os arquivos gerados de volta para o repositório
       # Este é o passo que estava faltando/com erro na sua implementação anterior.
