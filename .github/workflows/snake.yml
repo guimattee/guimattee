@@ -52,5 +52,6 @@ jobs:
           # O caminho para os arquivos que devem ser commitados.
           # O diretório de trabalho padrão é o root do repo, então 'dist/' já funciona.
           file_pattern: 'dist/snake.svg dist/snake-dark.svg'
-        # Condição para rodar este passo APENAS se a geração da cobrinha foi bem-sucedida
-        if: success() && steps.snake-generator.outputs.outputs != ''
+        # Condição para rodar este passo APENAS se o passo de geração da cobrinha foi bem-sucedido
+        # Simplificamos a condição, pois o debug confirmou que 'dist/' existe após a geração.
+        if: success() # <-- CONDIÇÃO SIMPLIFICADA AQUI
