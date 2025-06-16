@@ -8,9 +8,21 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions: # <-- ADICIONE ESTA SEÇÃO
+      contents: write # <-- ADICIONE ESTA LINHA PARA PERMISSÃO DE ESCRITA
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4 # <-- ALTERE PARA @v4 (versão mais recente)
+        with:
+          persist-credentials: false # <-- ADICIONE ESTA LINHA
+          fetch-depth: 0 # <-- ADICIONE ESTA LINHA
       - uses: Platane/snk@v3
         with:
-          github_user_name: guimattee # <-- MUITO IMPORTANTE: Seu username GitHub
+          github_user_name: guimattee # Seu username GitHub
           outputs: dist/snake.svg, dist/snake-dark.svg
+          # Adicione a linha abaixo para commitar automaticamente os arquivos gerados
+          # Isto é crucial para que os arquivos apareçam no seu repositório
+          # Também verifica se já existe para evitar commits desnecessários
+          git_commit_message: "Generated snake animation [skip ci]"
+          git_add: dist/snake.svg # Adiciona o arquivo para commit
+          git_branch_name: main # Garante que o commit vá para a branch principal
