@@ -16,13 +16,15 @@
   
 <img width="41%" height="195px" src="https://github-readme-stats.vercel.app/api/top-langs/?username=guimattee&layout=compact&hide_border=true&title_color=ff1af2&text_color=ffffff&bg_color=0d1117" />
   
-</div>
-
-###
-
+</div align=center>
+   
 <img src="https://raw.githubusercontent.com/guimattee/guimattee/output/snake.svg" alt="Snake animation" />
 
-###
+</div>
+
+
+
+
 
 
 
