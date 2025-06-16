@@ -1,0 +1,16 @@
+name: Generate Snake
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Runs every day at midnight UTC
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: Platane/snk@v3
+        with:
+          github_user_name: guimattee # <-- MUITO IMPORTANTE: Seu username GitHub
+          outputs: dist/snake.svg, dist/snake-dark.svg
