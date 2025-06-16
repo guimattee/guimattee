@@ -2,27 +2,47 @@ name: Generate Snake
 
 on:
   schedule:
-    - cron: "0 0 * * *" # Runs every day at midnight UTC
-  workflow_dispatch: # Allows manual triggering
+    - cron: "0 0 * * *" # Executa todo dia à meia-noite UTC
+  workflow_dispatch: # Permite acionamento manual
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions: # <-- ADICIONE ESTA SEÇÃO
-      contents: write # <-- ADICIONE ESTA LINHA PARA PERMISSÃO DE ESCRITA
+    permissions:
+      contents: write # Permissão de escrita para o repositório, essencial para commitar
 
     steps:
-      - uses: actions/checkout@v4 # <-- ALTERE PARA @v4 (versão mais recente)
+      # Passo 1: Faz o checkout do repositório
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          persist-credentials: false # <-- ADICIONE ESTA LINHA
-          fetch-depth: 0 # <-- ADICIONE ESTA LINHA
-      - uses: Platane/snk@v3
+          persist-credentials: false
+          fetch-depth: 0
+
+      # Passo 2: Gera a animação da cobrinha
+      - name: Generate snake SVG
+        uses: Platane/snk@v3
+        id: snake-generator # ID para referenciar este passo depois
         with:
           github_user_name: guimattee # Seu username GitHub
-          outputs: dist/snake.svg, dist/snake-dark.svg
-          # Adicione a linha abaixo para commitar automaticamente os arquivos gerados
-          # Isto é crucial para que os arquivos apareçam no seu repositório
-          # Também verifica se já existe para evitar commits desnecessários
-          git_commit_message: "Generated snake animation [skip ci]"
-          git_add: dist/snake.svg # Adiciona o arquivo para commit
-          git_branch_name: main # Garante que o commit vá para a branch principal
+          outputs: dist/snake.svg, dist/snake-dark.svg # Onde a cobrinha será gerada
+
+      # Passo 3: Commita os arquivos gerados de volta para o repositório
+      # Este é o passo que estava faltando/com erro na sua implementação anterior.
+      # Ele usa comandos git diretos.
+      - name: Commit generated files
+        run: |
+          # Configura o usuário para o commit
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Adiciona os arquivos gerados (snake.svg e snake-dark.svg)
+          git add dist/snake.svg dist/snake-dark.svg
+
+          # Tenta commitar. Se não houver mudanças, não gera erro.
+          git commit -m "Generated snake animation [skip ci]" || echo "No changes to commit"
+
+          # Envia as mudanças para a branch principal
+          git push
+        # Condição para rodar este passo APENAS se o passo de geração da cobrinha (snake-generator) foi bem-sucedido
+        if: success() && steps.snake-generator.outputs.outputs != ''
