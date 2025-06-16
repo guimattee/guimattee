@@ -19,7 +19,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      # DEBUG: Verifica o conteúdo antes de gerar a cobrinha
+      # DEBUG: Verifica o conteúdo antes de gerar a cobrinha (opcional, pode remover depois)
       - name: Debug - Before snake generation
         run: |
           echo "Conteúdo do diretório de trabalho antes da geração da cobrinha:"
@@ -28,35 +28,29 @@ jobs:
       # Passo 2: Gera a animação da cobrinha
       - name: Generate snake SVG
         uses: Platane/snk@v3
-        id: snake-generator # ID para referenciar este passo depois
+        id: snake-generator # ID para referenciar este passo
         with:
           github_user_name: guimattee # Seu username GitHub
           outputs: dist/snake.svg, dist/snake-dark.svg # Onde a cobrinha será gerada
 
-      # DEBUG: Verifica o conteúdo da pasta dist APÓS a geração da cobrinha
+      # DEBUG: Verifica o conteúdo da pasta dist APÓS a geração da cobrinha (opcional, pode remover depois)
       - name: Debug - After snake generation
         run: |
           echo "Conteúdo da pasta 'dist/' após a geração da cobrinha:"
           ls -la dist/ || echo "Pasta 'dist/' não encontrada!"
-        # Este passo de debug só é relevante se o passo anterior de geração foi bem-sucedido
-        if: success() && steps.snake-generator.outputs.outputs != ''
+        if: success()
 
       # Passo 3: Commita os arquivos gerados de volta para o repositório
-      # Este é o passo que estava faltando/com erro na sua implementação anterior.
-      # Ele usa comandos git diretos.
+      # Usamos a action 'git-auto-commit-action' para isso, que é mais robusta.
       - name: Commit generated files
-        run: |
-          # Configura o usuário para o commit
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          # Adiciona os arquivos gerados (snake.svg e snake-dark.svg)
-          git add dist/snake.svg dist/snake-dark.svg
-
-          # Tenta commitar. Se não houver mudanças, não gera erro.
-          git commit -m "Generated snake animation [skip ci]" || echo "No changes to commit"
-
-          # Envia as mudanças para a branch principal
-          git push
-        # Condição para rodar este passo APENAS se o passo de geração da cobrinha (snake-generator) foi bem-sucedido
+        uses: stefanzweifel/git-auto-commit-action@v5 # <-- NOVA ACTION AQUI
+        with:
+          commit_message: "Generated snake animation [skip ci]" # Mensagem do commit
+          branch: main # Garante que o commit vá para a branch principal
+          # Este parâmetro garante que a ação funcione mesmo se não houver mudanças, evitando falhas
+          create_branch: false
+          # O caminho para os arquivos que devem ser commitados.
+          # O diretório de trabalho padrão é o root do repo, então 'dist/' já funciona.
+          file_pattern: 'dist/snake.svg dist/snake-dark.svg'
+        # Condição para rodar este passo APENAS se a geração da cobrinha foi bem-sucedida
         if: success() && steps.snake-generator.outputs.outputs != ''
