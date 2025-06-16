@@ -20,7 +20,7 @@
 
 ###
 
-<img src="https://raw.githubusercontent.com/guimattee/guimattee/dist/snake.svg" alt="Snake animation" />
+<img src="https://raw.githubusercontent.com/guimattee/guimattee/output/snake.svg" alt="Snake animation" />
 
 ###
 
